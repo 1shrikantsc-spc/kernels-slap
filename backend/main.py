@@ -11,7 +11,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://localhost:3002", "http://localhost:3001"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -66,7 +66,7 @@ async def get_hint(payload: dict):
 
     # Step 2 — Generate personalised hint
     response = groq_client.chat.completions.create(
-        model="qwen-qwq-32b",
+        model="llama-3.3-70b-versatile",
         messages=[
             {
                 "role": "system",
@@ -104,7 +104,7 @@ async def premortem(payload: dict):
     past_text = str(past) if past else "No history yet"
 
     response = groq_client.chat.completions.create(
-        model="qwen-qwq-32b",
+        model="llama-3.3-70b-versatile",
         messages=[
             {
                 "role": "system",
@@ -150,7 +150,7 @@ async def greeting(user_id: str):
     past_text = str(past) if past else "No history yet"
 
     response = groq_client.chat.completions.create(
-        model="qwen-qwq-32b",
+        model="llama-3.3-70b-versatile",
         messages=[
             {
                 "role": "system",
@@ -164,3 +164,108 @@ async def greeting(user_id: str):
     )
 
     return {"greeting": response.choices[0].message.content}
+
+import json
+
+@app.get("/api/dashboard/{user_id}")
+async def get_dashboard(user_id: str):
+    past = await recall(user_id, "all past errors, mistakes, hints, and solved problems")
+    past_text = str(past) if past else "No history yet"
+
+    system_prompt = """You are a data analysis engine for the Kernel's Slap coding mentor. 
+Based on the student's history, generate a strict JSON payload for their dashboard.
+The JSON must have this exact structure:
+{
+  "stats": {"solved": 24, "mistakes": 32, "improvement": "78%"},
+  "errorData": [
+    {"skill": "Recursion", "mistakes": 8},
+    {"skill": "Arrays", "mistakes": 3},
+    {"skill": "Loops", "mistakes": 6},
+    {"skill": "Logic", "mistakes": 4},
+    {"skill": "Syntax", "mistakes": 2}
+  ],
+  "progressData": [
+    {"day": "Mon", "solved": 2, "mistakes": 5},
+    {"day": "Tue", "solved": 3, "mistakes": 4},
+    {"day": "Wed", "solved": 4, "mistakes": 3},
+    {"day": "Thu", "solved": 5, "mistakes": 2},
+    {"day": "Fri", "solved": 6, "mistakes": 1}
+  ],
+  "learningPath": [
+    {"topic": "Arrays", "status": "done"},
+    {"topic": "Loops", "status": "done"},
+    {"topic": "Recursion", "status": "current"},
+    {"topic": "Trees", "status": "next"},
+    {"topic": "Graphs", "status": "locked"}
+  ]
+}
+If history is empty or short, invent realistic but low generic starting numbers. However, heavily skew the data to reflect whatever mistakes and solutions are explicitly found in the history."""
+    
+    response = groq_client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": f"Student history: {past_text}"}
+        ],
+        response_format={"type": "json_object"}
+    )
+    
+    return json.loads(response.choices[0].message.content)
+
+import subprocess
+import tempfile
+
+@app.post("/api/execute")
+async def execute_code(payload: dict):
+    code = payload.get("code", "")
+    language = payload.get("language", "python")
+
+    if language.lower() != "python":
+        return {"output": "", "error": f"Language {language} not supported locally", "status": "error"}
+
+    # Run the python code safely in a temporary file
+    with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w", encoding="utf-8") as temp_file:
+        temp_file.write(code)
+        temp_path = temp_file.name
+
+    try:
+        # Execute the python script
+        result = subprocess.run(
+            ["python", temp_path],
+            capture_output=True,
+            text=True,
+            timeout=10  # 10 second timeout for safety
+        )
+        
+        output = result.stdout
+        error = result.stderr
+        
+        # Clean up the temp file
+        import os
+        os.remove(temp_path)
+
+        if not output and not error:
+            output = "Code executed successfully with no output."
+
+        return {
+            "output": output,
+            "error": error,
+            "status": "success" if result.returncode == 0 else "error"
+        }
+    except subprocess.TimeoutExpired:
+        import os
+        os.remove(temp_path)
+        return {
+            "output": "",
+            "error": "Execution timed out (10s limit)",
+            "status": "error"
+        }
+    except Exception as e:
+        import os
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        return {
+            "output": "",
+            "error": str(e),
+            "status": "error"
+        }
