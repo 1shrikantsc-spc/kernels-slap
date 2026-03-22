@@ -1,0 +1,22 @@
+{
+  "shrikant": {
+    "user_id": "user_shrikant",
+    "display_name": "Shrikant",
+    "password_hash": "09dbbb52070b0651d3f7a1374412502326f05c14f9b2daa2c5b9d0135b6e7de4"
+  },
+  "stats_tester": {
+    "user_id": "user_stats_tester",
+    "display_name": "Stats Tester",
+    "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+  },
+  "shrikant12": {
+    "user_id": "user_shrikant12",
+    "display_name": "Shrikant",
+    "password_hash": "8f89e939acd909012b50238c28fa6738a566ee3ca2420522f8e4751b34073fd5"
+  },
+  "chickoo": {
+    "user_id": "user_chickoo",
+    "display_name": "Shrikant",
+    "password_hash": "8f89e939acd909012b50238c28fa6738a566ee3ca2420522f8e4751b34073fd5"
+  }
+}

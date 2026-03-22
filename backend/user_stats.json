@@ -1,0 +1,124 @@
+{
+  "user_stats_tester": {
+    "solved_count": 0,
+    "hints_used": 0,
+    "mistakes_by_category": {
+      "Recursion": 0,
+      "Syntax": 0,
+      "Logic": 0,
+      "Arrays": 0,
+      "Edge Cases": 0,
+      "Loops": 0,
+      "Strings": 0,
+      "Other": 0
+    },
+    "daily_counts": {},
+    "recent_mistakes": [],
+    "last_session": null
+  },
+  "user_shrikant12": {
+    "solved_count": 3,
+    "hints_used": 3,
+    "mistakes_by_category": {
+      "Recursion": 0,
+      "Syntax": 3,
+      "Logic": 0,
+      "Arrays": 0,
+      "Edge Cases": 0,
+      "Loops": 0,
+      "Strings": 0,
+      "Other": 0
+    },
+    "daily_counts": {
+      "2026-03-22": {
+        "solved": 3,
+        "mistakes": 3
+      }
+    },
+    "recent_mistakes": [
+      {
+        "category": "Syntax",
+        "error": "  File \"C:\\Users\\chick\\AppData\\Local\\Temp\\tmpoo738v6q.py\", line 7\n    for i in range(1, n + 1)\n                         ",
+        "code_snippet": "def calculate_factorial(n):\r\n    result = 1\r\n    # Multiply result by every number from 1 to n\r\n    ",
+        "date": "Mar 22, 18:25"
+      },
+      {
+        "category": "Syntax",
+        "error": "  File \"C:\\Users\\chick\\AppData\\Local\\Temp\\tmp_xb11gvq.py\", line 2\n    def greet(name):\nIndentationError: unexpected inde",
+        "code_snippet": "count = 10\n  while count > 0:\n      print(count)",
+        "date": "Mar 22, 18:04"
+      },
+      {
+        "category": "Syntax",
+        "error": "  File \"C:\\Users\\chick\\AppData\\Local\\Temp\\tmp9tkeqtcf.py\", line 2\n    def greet(name)\nIndentationError: unexpected inden",
+        "code_snippet": "# Write your code here\n def greet(name)\n      return \"Hello \" + name\n  greet(\"Alice\")",
+        "date": "Mar 22, 18:03"
+      }
+    ],
+    "last_session": "2026-03-22T21:13:32.507452"
+  },
+  "user_shrikant": {
+    "solved_count": 0,
+    "hints_used": 1,
+    "mistakes_by_category": {
+      "Recursion": 0,
+      "Syntax": 1,
+      "Logic": 0,
+      "Arrays": 0,
+      "Edge Cases": 0,
+      "Loops": 0,
+      "Strings": 0,
+      "Other": 0
+    },
+    "daily_counts": {
+      "2026-03-22": {
+        "solved": 0,
+        "mistakes": 1
+      }
+    },
+    "recent_mistakes": [
+      {
+        "category": "Syntax",
+        "error": "  File \"C:\\Users\\chick\\AppData\\Local\\Temp\\tmphpos15dz.py\", line 1\n    for i in range(10) print(i)\n                      ",
+        "code_snippet": "for i in range(10) print(i)",
+        "date": "Mar 22, 20:01"
+      }
+    ],
+    "last_session": "2026-03-22T20:01:50.595360"
+  },
+  "user_chickoo": {
+    "solved_count": 2,
+    "hints_used": 2,
+    "mistakes_by_category": {
+      "Recursion": 0,
+      "Syntax": 2,
+      "Logic": 0,
+      "Arrays": 0,
+      "Edge Cases": 0,
+      "Loops": 0,
+      "Strings": 0,
+      "Other": 0
+    },
+    "daily_counts": {
+      "2026-03-22": {
+        "solved": 2,
+        "mistakes": 2
+      }
+    },
+    "recent_mistakes": [
+      {
+        "category": "Syntax",
+        "error": "general error",
+        "code_snippet": "def shrikant(n):\r\n    return n*n\r\nnum=10\r\nchickoo=shrikant(num)\r\nprint(chickoo)",
+        "date": "Mar 22, 21:19"
+      },
+      {
+        "category": "Syntax",
+        "error": "general error",
+        "code_snippet": "def shrikant(n):\r\n    print(n*n)\r\nnum=10\r\nchickoo=shrikant(num)\r\nprint(shrikant)",
+        "date": "Mar 22, 21:18"
+      }
+    ],
+    "last_session": "2026-03-22T21:22:34.771791"
+  }
+}
