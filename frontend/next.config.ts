@@ -9,13 +9,15 @@ const nextConfig: NextConfig = {
             },
         ],
     },
-   async rewrites() {
-    return [
-        {
-            source: "/api/:path*",
-            destination: "https://kernels-slap-backend.onrender.com/api/:path*",
-        },
-    ];
-}
+
+    async rewrites() {
+        return [
+            {
+                source: "/api/:path*",
+                destination: "https://kernels-slap-backend.onrender.com/api/:path*",
+            },
+        ];
+    }, 
+};
 
 export default nextConfig;
