@@ -88,7 +88,7 @@
   },
   "user_chickoo": {
     "solved_count": 2,
-    "hints_used": 2,
+    "hints_used": 4,
     "mistakes_by_category": {
       "Recursion": 0,
       "Syntax": 2,
@@ -97,15 +97,27 @@
       "Edge Cases": 0,
       "Loops": 0,
       "Strings": 0,
-      "Other": 0
+      "Other": 2
     },
     "daily_counts": {
       "2026-03-22": {
         "solved": 2,
-        "mistakes": 2
+        "mistakes": 4
       }
     },
     "recent_mistakes": [
+      {
+        "category": "Other",
+        "error": "general error",
+        "code_snippet": "print(\"chhickoo\")",
+        "date": "Mar 22, 22:25"
+      },
+      {
+        "category": "Other",
+        "error": "general error",
+        "code_snippet": "print(\"chhickoo\");",
+        "date": "Mar 22, 22:24"
+      },
       {
         "category": "Syntax",
         "error": "general error",
@@ -119,6 +131,99 @@
         "date": "Mar 22, 21:18"
       }
     ],
-    "last_session": "2026-03-22T21:22:34.771791"
+    "last_session": "2026-03-22T22:25:15.957702"
+  },
+  "tester": {
+    "solved_count": 0,
+    "hints_used": 0,
+    "mistakes_by_category": {
+      "Recursion": 0,
+      "Syntax": 0,
+      "Logic": 0,
+      "Arrays": 0,
+      "Edge Cases": 0,
+      "Loops": 0,
+      "Strings": 0,
+      "Other": 0
+    },
+    "daily_counts": {},
+    "recent_mistakes": [],
+    "last_session": null
+  },
+  "user_prakash": {
+    "solved_count": 0,
+    "hints_used": 3,
+    "mistakes_by_category": {
+      "Recursion": 0,
+      "Syntax": 3,
+      "Logic": 0,
+      "Arrays": 0,
+      "Edge Cases": 0,
+      "Loops": 0,
+      "Strings": 0,
+      "Other": 0
+    },
+    "daily_counts": {
+      "2026-03-23": {
+        "solved": 0,
+        "mistakes": 3
+      }
+    },
+    "recent_mistakes": [
+      {
+        "category": "Syntax",
+        "error": "general error",
+        "code_snippet": "shhrikant='chickoo'\r\nprint(shhrikant)",
+        "date": "Mar 23, 14:40"
+      },
+      {
+        "category": "Syntax",
+        "error": "general error",
+        "code_snippet": "print(hadgdgd)",
+        "date": "Mar 23, 14:38"
+      },
+      {
+        "category": "Syntax",
+        "error": "general error",
+        "code_snippet": "print(praksh)",
+        "date": "Mar 23, 14:14"
+      }
+    ],
+    "last_session": "2026-03-23T14:40:16.745390"
+  },
+  "user_kunal": {
+    "solved_count": 1,
+    "hints_used": 2,
+    "mistakes_by_category": {
+      "Recursion": 0,
+      "Syntax": 1,
+      "Logic": 1,
+      "Arrays": 0,
+      "Edge Cases": 0,
+      "Loops": 0,
+      "Strings": 0,
+      "Other": 0
+    },
+    "daily_counts": {
+      "2026-03-23": {
+        "solved": 1,
+        "mistakes": 2
+      }
+    },
+    "recent_mistakes": [
+      {
+        "category": "Logic",
+        "error": "general error",
+        "code_snippet": "def calculate_average():\r\n    result = totel / count\r\n    total = [10, 20, 30]\r\n    count = len(tota",
+        "date": "Mar 23, 18:52"
+      },
+      {
+        "category": "Syntax",
+        "error": "  File \"C:\\Users\\chick\\AppData\\Local\\Temp\\tmph3znqxt0.py\", line 1\n    def check_score(score)\n                          ^",
+        "code_snippet": "def check_score(score)\r\n    if score > 90\r\n        print(\"Excellent!\")\r\n    else\r\n        print(\"Kee",
+        "date": "Mar 23, 18:50"
+      }
+    ],
+    "last_session": "2026-03-23T18:56:28.265656"
   }
 }

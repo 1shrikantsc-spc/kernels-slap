@@ -187,7 +187,7 @@ export default function ChallengePage() {
               <Trophy className="w-12 h-12 mx-auto text-emerald-300 mb-3 animate-pulse" />
               <h2 className="text-2xl font-black text-emerald-300 mb-2 tracking-tight">PERFECT!</h2>
               {stars !== null && (
-                 <div className="inline-block flex items-center justify-center gap-2 bg-emerald-950 border border-emerald-700 rounded-full px-4 py-1 mt-2 w-fit mx-auto">
+                 <div className="flex items-center justify-center gap-2 bg-emerald-950 border border-emerald-700 rounded-full px-4 py-1 mt-2 w-fit mx-auto">
                     <span className="text-emerald-400 font-bold flex items-center gap-1"><Star className="w-4 h-4"/> Total Stars: {stars}</span>
                     <span className="text-emerald-200/50">|</span>
                     <span className="text-emerald-300 font-bold">Level {Math.floor(stars / 5) + 1}</span>

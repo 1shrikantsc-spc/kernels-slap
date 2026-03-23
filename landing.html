@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kernel's Slap | The AI Mentor That Remembers</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --bg-panel: #0a0a0a;
+            --accent-primary: #8b5cf6; /* Violet */
+            --accent-secondary: #ec4899; /* Pink */
+            --accent-warning: #f59e0b; /* Amber/Orange */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
+            selection-background: var(--accent-primary);
+            selection-color: white;
+        }
+
+        ::selection {
+            background: rgba(139, 92, 246, 0.5);
+            color: white;
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Cinematic Noise Overlay */
+        .noise-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Ambient Glows */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #c4b5fd, #f9a8d4, #fcd34d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- MACBOOK MOCKUP CSS --- */
+        .laptop-container {
+            perspective: 2000px;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .macbook {
+            width: 100%;
+            transform-style: preserve-3d;
+            /* Initial state for GSAP to animate from */
+            transform: rotateX(20deg) scale(0.9);
+            will-change: transform;
+        }
+
+        .macbook-screen-lid {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: #111;
+            border-radius: 20px 20px 0 0;
+            padding: 2% 2% 3% 2%;
+            box-shadow: inset 0 0 0 2px #333, 0 -5px 20px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .macbook-display {
+            width: 100%;
+            height: 100%;
+            background: #0d1117; /* Editor BG */
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .macbook-base {
+            width: 110%;
+            height: 20px;
+            background: linear-gradient(to bottom, #444, #111);
+            margin-left: -5%;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        .macbook-base::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 15%; height: 4px;
+            background: #222;
+            border-radius: 0 0 4px 4px;
+        }
+
+        /* --- VS CODE EDITOR --- */
+        .editor-header {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mac-dots div { width: 10px; height: 10px; border-radius: 50%; }
+        .editor-body { padding: 16px; position: relative; }
+        .code-line { display: flex; gap: 16px; line-height: 1.6; font-size: 0.9rem;}
+        .line-num { color: #484f58; user-select: none; width: 20px; text-align: right; }
+        
+        /* Code Syntax Colors */
+        .c-kw { color: #ff7b72; } /* Keyword */
+        .c-fn { color: #d2a8ff; } /* Function */
+        .c-str { color: #a5d6ff; } /* String */
+        .c-cm { color: #8b949e; font-style: italic; } /* Comment */
+        
+        .cursor-blink {
+            display: inline-block;
+            width: 8px; height: 1.2em;
+            background: #c9d1d9;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- THE PRE-MORTEM WARNING LABEL --- */
+        .pre-mortem-label {
+            position: absolute;
+            top: 70px; /* Aligned to line 4 */
+            left: 120px;
+            background: rgba(20, 0, 0, 0.85);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            backdrop-filter: blur(8px);
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #fca5a5;
+            box-shadow: 0 10px 40px rgba(220, 38, 38, 0.2);
+            z-index: 10;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            max-width: 350px;
+            opacity: 0; /* Hidden initially, GSAP will reveal */
+            transform: translateY(10px) scale(0.95);
+        }
+        .pre-mortem-label::before {
+            content: ''; position: absolute;
+            left: -15px; top: 12px;
+            border-width: 8px;
+            border-style: solid;
+            border-color: transparent rgba(239, 68, 68, 0.4) transparent transparent;
+        }
+
+        /* DNA Radar Chart */
+        .radar-svg { filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.3)); }
+        .radar-grid { stroke: rgba(255,255,255,0.08); stroke-width: 1; }
+        .dna-path {
+            fill: rgba(139, 92, 246, 0.2);
+            stroke: var(--accent-primary);
+            stroke-width: 2.5;
+            transition: all 1s ease;
+        }
+    </style>
+</head>
+<body class="antialiased text-slate-300">
+
+    <div class="noise-bg"></div>
+
+    <!-- Background Orbs -->
+    <div class="glow-orb bg-violet-600/30 w-[600px] h-[600px] top-0 left-[-200px]"></div>
+    <div class="glow-orb bg-pink-600/20 w-[500px] h-[500px] top-[40%] right-[-100px]"></div>
+    <div class="glow-orb bg-blue-600/20 w-[800px] h-[800px] bottom-[-200px] left-[10%]"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-panel border-b-0 border-white/5 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 to-pink-500 flex items-center justify-center text-xl shadow-[0_0_20px_rgba(139,92,246,0.5)]">
+                    🧠
+                </div>
+                <span class="text-xl font-bold tracking-tight text-white">Kernel's Slap</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-medium">
+                <a href="#laptop-section" class="hover:text-white transition">Pre-Mortem</a>
+                <a href="#dna-section" class="hover:text-white transition">Error DNA</a>
+                <a href="#architecture" class="hover:text-white transition">Architecture</a>
+            </div>
+            <a href="/dashboard" class="px-6 py-2.5 rounded-full bg-white text-black font-semibold text-sm hover:scale-105 transition-transform">
+                View Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-[100vh] flex flex-col items-center justify-center pt-32 px-6 text-center z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border border-violet-500/30 text-violet-300 text-xs font-bold uppercase tracking-widest mb-8 reveal-load">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+            </span>
+            Built for Microsoft Hackathon
+        </div>
+        
+        <h1 class="text-6xl md:text-8xl lg:text-[7rem] font-black leading-[1.05] tracking-tight text-white mb-6 reveal-load" style="animation-delay: 0.1s;">
+            The AI Mentor That <br>
+            <span class="text-gradient">Remembers You.</span>
+        </h1>
+        
+        <p class="text-lg md:text-2xl text-slate-400 max-w-3xl mx-auto mb-12 font-medium reveal-load" style="animation-delay: 0.2s;">
+            Every platform today is stateless. Kernel's Slap tracks your thinking patterns, predicts your syntax errors before you run the code, and evolves with your Error DNA.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-6 items-center reveal-load" style="animation-delay: 0.3s;">
+            <button class="px-8 py-4 rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 text-white font-bold text-lg hover:shadow-[0_0_40px_rgba(139,92,246,0.6)] hover:-translate-y-1 transition-all duration-300">
+                Experience Memory
+            </button>
+            <div class="flex items-center gap-3 text-slate-500 font-mono text-sm px-6 py-4 rounded-xl glass-panel">
+                <span class="text-violet-400">Predict</span> → Run → Learn → Improve
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce">
+            <span class="text-xs font-mono uppercase tracking-widest">Scroll to see the magic</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+    </section>
+
+    <!-- Interactive Laptop Animation Section -->
+    <section id="laptop-section" class="relative py-32 px-6 min-h-[120vh]">
+        <div class="max-w-7xl mx-auto text-center mb-16">
+            <h2 class="text-4xl md:text-6xl font-black text-white mb-4">Proactive, Not Reactive.</h2>
+            <p class="text-xl text-slate-400">Watch the AI predict a mistake <span class="text-red-400 font-semibold">before the code is even run.</span></p>
+        </div>
+
+        <!-- The Laptop Trigger Container (GSAP will pin this) -->
+        <div class="laptop-wrapper flex justify-center sticky top-32">
+            <div class="laptop-container">
+                <div class="macbook">
+                    <div class="macbook-screen-lid">
+                        <div class="macbook-display flex flex-col">
+                            <!-- VS Code Header -->
+                            <div class="editor-header">
+                                <div class="mac-dots flex gap-1.5 mr-4">
+                                    <div class="bg-[#ff5f56]"></div>
+                                    <div class="bg-[#ffbd2e]"></div>
+                                    <div class="bg-[#27c93f]"></div>
+                                </div>
+                                <div class="font-mono text-[11px] text-[#8b949e]">recursion_test.py — Kernel's Slap Editor</div>
+                            </div>
+                            <!-- VS Code Body -->
+                            <div class="editor-body font-mono text-sm flex-1">
+                                <div class="code-line"><span class="line-num">1</span> <div><span class="c-kw">def</span> <span class="c-fn">calculate_factorial</span>(n):</div></div>
+                                <div class="code-line"><span class="line-num">2</span> <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-cm"># User is typing the logic...</span></div></div>
+                                
+                                <!-- Typing Area -->
+                                <div class="code-line relative mt-1">
+                                    <span class="line-num">3</span> 
+                                    <div id="typing-line" class="text-white">&nbsp;&nbsp;&nbsp;&nbsp;<span class="cursor-blink"></span></div>
+                                    
+                                    <!-- THE PRE-MORTEM LABEL (Hidden initially) -->
+                                    <div id="warning-label" class="pre-mortem-label">
+                                        <div class="text-2xl pt-1">🤖</div>
+                                        <div>
+                                            <div class="text-xs font-bold text-red-500 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                                                Pre-Mortem Warning
+                                            </div>
+                                            <div class="text-sm font-medium text-white mb-1">
+                                                This syntax/logic mistake you did <span class="text-red-400">4th time again.</span>
+                                            </div>
+                                            <div class="text-xs text-slate-400">
+                                                Like in this line, a missing base case error will occur. The system remembers your previous attempts.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="code-line mt-1"><span class="line-num">4</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="macbook-base"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bento Grid Features Section -->
+    <section class="py-32 px-6 relative z-10 bg-black">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Box 1 -->
+                <div class="glass-panel p-8 rounded-3xl md:col-span-2 hover:bg-white/[0.04] transition-colors border-white/[0.05] feature-box">
+                    <div class="flex flex-col lg:flex-row gap-8 items-center h-full">
+                        <div class="lg:w-1/2">
+                            <div class="w-14 h-14 bg-violet-500/20 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-[0_0_30px_rgba(139,92,246,0.3)]">🧠</div>
+                            <h3 class="text-3xl font-bold text-white mb-4">Hindsight Memory Engine</h3>
+                            <p class="text-slate-400 text-lg max-w-xl">Every mistake, success, and hint is retained forever using Hindsight Cloud. Before the AI speaks, it recalls your exact coding history. It never gives a generic "check documentation" hint again.</p>
+                        </div>
+                        <div class="lg:w-1/2 w-full h-[240px] bg-[#050505] rounded-2xl border border-white/10 p-5 font-mono text-xs sm:text-sm flex flex-col relative overflow-hidden shadow-2xl shadow-violet-900/20">
+                            <!-- Terminal Header -->
+                            <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-3">
+                                <div class="flex gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                                    <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                                    <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+                                </div>
+                                <div class="text-[10px] text-slate-500 tracking-widest uppercase font-bold">Memory_Retrieval.log</div>
+                            </div>
+                            
+                            <!-- Terminal Body -->
+                            <div class="flex-1 space-y-2.5 relative z-10 text-[13px] leading-relaxed">
+                                <div class="hindsight-log opacity-0 translate-y-2"><span class="text-slate-500">></span> <span class="text-violet-400">await</span> <span class="text-blue-400">hindsight.recall</span>({ user: <span class="text-green-300">'shrikant'</span> })</div>
+                                <div class="hindsight-log opacity-0 translate-y-2 text-slate-400 pl-3">Searching vector DB for past patterns...</div>
+                                <div class="hindsight-log opacity-0 translate-y-2 pl-3 border-l-2 border-amber-500/30 ml-1 py-1">
+                                    <div class="text-amber-400"><span class="text-amber-500/50">↳</span> Found 3 recursive logic errors (Last week)</div>
+                                    <div class="text-amber-400"><span class="text-amber-500/50">↳</span> Identified learning style: Needs Analogies</div>
+                                </div>
+                                <div class="hindsight-log opacity-0 translate-y-2 text-pink-400"><span class="text-slate-500">></span> Generating personalized response context...</div>
+                                <div class="hindsight-log opacity-0 translate-y-2 text-green-400 flex items-center gap-2">
+                                    <span>✓ Context successfully injected.</span>
+                                    <span class="cursor-blink bg-green-400 h-3 w-1.5 inline-block"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Gradient fade for terminal bottom -->
+                            <div class="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-[#050505] to-transparent z-20 pointer-events-none"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Box 2 -->
+                <div class="glass-panel p-8 rounded-3xl hover:bg-white/[0.04] transition-colors border-white/[0.05] feature-box">
+                    <div class="w-14 h-14 bg-pink-500/20 rounded-2xl flex items-center justify-center text-3xl mb-6">🎯</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Targeted Practice</h3>
+                    <p class="text-slate-400">Problems are not random. The AI generates challenges specifically targeting your weakest points based on actual failure data.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Error DNA Visualization Section -->
+    <section id="dna-section" class="py-32 px-6 relative border-t border-white/[0.05]">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+            
+            <div class="order-2 md:order-1 relative">
+                <!-- Decorative background elements -->
+                <div class="absolute inset-0 bg-violet-500/10 blur-3xl rounded-full"></div>
+                
+                <div class="glass-panel p-10 rounded-[2rem] relative z-10 border border-violet-500/20">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h4 class="font-bold text-white text-xl">Real-Time Error DNA 🧬</h4>
+                            <p class="text-xs text-slate-400 mt-1">Based on actual mistake history — not estimated</p>
+                        </div>
+                        <div class="px-3 py-1 rounded-md bg-black border border-white/10 font-mono text-xs text-violet-400">Live Sync</div>
+                    </div>
+                    
+                    <div class="flex justify-center items-center h-72 w-full relative">
+                        <svg viewBox="0 0 200 200" class="w-full h-full radar-svg">
+                            <!-- Background Web -->
+                            <polygon points="100,10 190,100 100,190 10,100" fill="none" class="radar-grid" />
+                            <polygon points="100,32.5 167.5,100 100,167.5 32.5,100" fill="none" class="radar-grid" />
+                            <polygon points="100,55 145,100 100,145 55,100" fill="none" class="radar-grid" />
+                            <polygon points="100,77.5 122.5,100 100,122.5 77.5,100" fill="none" class="radar-grid" />
+                            
+                            <!-- Crosshairs -->
+                            <line x1="100" y1="10" x2="100" y2="190" class="radar-grid" />
+                            <line x1="10" y1="100" x2="190" y2="100" class="radar-grid" />
+
+                            <!-- Dynamic DNA Path (Will animate via JS) -->
+                            <polygon id="dna-polygon" points="100,40 160,100 100,150 70,100" class="dna-path" />
+                            
+                            <!-- Plot Points -->
+                            <circle cx="100" cy="40" r="3" fill="#8b5cf6" class="dna-point" />
+                            <circle cx="160" cy="100" r="3" fill="#8b5cf6" class="dna-point" />
+                            <circle cx="100" cy="150" r="3" fill="#8b5cf6" class="dna-point" />
+                            <circle cx="70" cy="100" r="3" fill="#8b5cf6" class="dna-point" />
+
+                            <!-- Axis Labels -->
+                            <text x="100" y="5" text-anchor="middle" fill="#94a3b8" font-size="6" font-family="monospace" class="tracking-widest uppercase">Syntax</text>
+                            <text x="195" y="102" text-anchor="start" fill="#94a3b8" font-size="6" font-family="monospace" class="tracking-widest uppercase">Logic</text>
+                            <text x="100" y="198" text-anchor="middle" fill="#94a3b8" font-size="6" font-family="monospace" class="tracking-widest uppercase">Recursion</text>
+                            <text x="5" y="102" text-anchor="end" fill="#94a3b8" font-size="6" font-family="monospace" class="tracking-widest uppercase">Arrays</text>
+                        </svg>
+                    </div>
+
+                    <div class="mt-8 flex gap-4">
+                        <div class="flex-1 bg-[#0a0a0a] border border-white/5 p-4 rounded-xl">
+                            <div class="text-3xl font-black text-white mb-1">60%</div>
+                            <div class="text-xs text-slate-500 uppercase tracking-wider">Improvement Rate</div>
+                        </div>
+                        <div class="flex-1 bg-[#0a0a0a] border border-white/5 p-4 rounded-xl">
+                            <div class="text-3xl font-black text-amber-500 mb-1">3</div>
+                            <div class="text-xs text-slate-500 uppercase tracking-wider">Mistakes Remembered</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-1 md:order-2 dna-text">
+                <h2 class="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">Your Coding Journey, <br><span class="text-gradient">Visualized.</span></h2>
+                <p class="text-xl text-slate-400 mb-8 font-light">
+                    Kernel's Slap builds a live profile of your weaknesses over time. 
+                    This isn't an AI guess—it's a mathematical fingerprint constructed from your real successes and failures across sessions.
+                </p>
+                <div class="space-y-6">
+                    <div class="flex gap-4 items-start">
+                        <div class="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400 mt-1 shrink-0">1</div>
+                        <div>
+                            <h4 class="font-bold text-white text-lg">Tracks actual counts</h4>
+                            <p class="text-slate-500 text-sm">Every compilation error or logic miss is categorized and saved.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 items-start">
+                        <div class="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-400 mt-1 shrink-0">2</div>
+                        <div>
+                            <h4 class="font-bold text-white text-lg">Adapts problem difficulty</h4>
+                            <p class="text-slate-500 text-sm">If your Syntax DNA is huge, it feeds you syntax cloze challenges.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Marquee -->
+    <section id="architecture" class="py-20 border-y border-white/5 bg-black overflow-hidden relative">
+        <div class="absolute left-0 top-0 w-32 h-full bg-gradient-to-r from-black to-transparent z-10"></div>
+        <div class="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-black to-transparent z-10"></div>
+        
+        <div class="flex gap-16 items-center whitespace-nowrap opacity-60 hover:opacity-100 transition-opacity duration-500" id="tech-marquee">
+            <!-- Duplicated for seamless loop -->
+            <div class="flex gap-16 items-center font-mono text-xl tracking-widest uppercase">
+                <span>FastAPI Backend</span> <span class="text-violet-500">•</span>
+                <span>Next.js 14</span> <span class="text-violet-500">•</span>
+                <span>Hindsight Memory SDK</span> <span class="text-violet-500">•</span>
+                <span>Groq Llama-3 70B</span> <span class="text-violet-500">•</span>
+                <span>Piston Code Execution</span> <span class="text-violet-500">•</span>
+            </div>
+            <div class="flex gap-16 items-center font-mono text-xl tracking-widest uppercase">
+                <span>FastAPI Backend</span> <span class="text-violet-500">•</span>
+                <span>Next.js 14</span> <span class="text-violet-500">•</span>
+                <span>Hindsight Memory SDK</span> <span class="text-violet-500">•</span>
+                <span>Groq Llama-3 70B</span> <span class="text-violet-500">•</span>
+                <span>Piston Code Execution</span> <span class="text-violet-500">•</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-40 px-6 text-center relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-96 bg-violet-600/20 blur-[100px] rounded-full pointer-events-none"></div>
+        
+        <div class="relative z-10">
+            <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tight">Stop building stateless AI.</h2>
+            <p class="text-xl text-slate-400 mb-12 max-w-2xl mx-auto">
+                Ready to see what an AI mentor feels like when it actually remembers who you are?
+            </p>
+            <button class="px-10 py-5 rounded-2xl bg-white text-black font-black text-xl hover:scale-105 hover:shadow-[0_0_50px_rgba(255,255,255,0.3)] transition-all duration-300">
+                View GitHub Repo
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 border-t border-white/10 text-center text-slate-600 font-mono text-sm bg-black">
+        <p>© 2026 Kernel's Slap. Microsoft National Hackathon Submission.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+        // --- Initial Load Animations ---
+        gsap.from(".reveal-load", {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.1,
+            ease: "power3.out"
+        });
+
+        // --- Tech Marquee Animation ---
+        gsap.to("#tech-marquee", {
+            xPercent: -50,
+            ease: "none",
+            duration: 20,
+            repeat: -1
+        });
+
+        // --- Bento Grid Reveals ---
+        gsap.from(".feature-box", {
+            scrollTrigger: {
+                trigger: ".feature-box",
+                start: "top 80%",
+            },
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "back.out(1.7)"
+        });
+
+        // --- Hindsight Terminal Log Animation ---
+        gsap.to(".hindsight-log", {
+            scrollTrigger: {
+                trigger: ".feature-box", // Trigger when the box appears
+                start: "top 60%",
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.1,
+            stagger: 0.5, // Type out each line one by one
+            ease: "none"
+        });
+
+        // --- DNA Section Animations ---
+        gsap.from(".dna-text", {
+            scrollTrigger: {
+                trigger: "#dna-section",
+                start: "top 70%",
+            },
+            x: 50,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out"
+        });
+
+        // Animate the DNA Polygon Shape on scroll
+        gsap.to("#dna-polygon", {
+            scrollTrigger: {
+                trigger: "#dna-section",
+                start: "top 60%",
+                toggleActions: "play none none reverse"
+            },
+            attr: { points: "100,10 180,100 100,190 40,100" }, // Expands to show huge growth/weakness
+            duration: 1.5,
+            ease: "elastic.out(1, 0.5)"
+        });
+        gsap.to(".dna-point", {
+            scrollTrigger: { trigger: "#dna-section", start: "top 60%" },
+            attr: { 
+                cy: (i) => [10, 100, 190, 100][i],
+                cx: (i) => [100, 180, 100, 40][i]
+            },
+            duration: 1.5,
+            ease: "elastic.out(1, 0.5)"
+        });
+
+        // --- THE MASTERPIECE: MACBOOK & PRE-MORTEM ANIMATION ---
+        
+        // 1. Setup the timeline linked to the scroll position
+        const tlLaptop = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#laptop-section",
+                start: "top top", // When section hits top of viewport
+                end: "+=1500",    // Pin for 1500px of scrolling
+                pin: true,        // Pin the section
+                scrub: 1,         // Smooth scrubbing
+            }
+        });
+
+        // 2. Animate the Laptop transforming into a flat, front-facing view
+        tlLaptop.to(".macbook", {
+            rotateX: 0,
+            scale: 1,
+            duration: 2,
+            ease: "power2.inOut"
+        });
+
+        // 3. Type out the bad code using TextPlugin
+        tlLaptop.to("#typing-line", {
+            text: {
+                value: "&nbsp;&nbsp;&nbsp;&nbsp;<span class='c-kw'>return</span> n * <span class='c-fn'>calculate_factorial</span>(n - 1)<span class='cursor-blink'></span>",
+                delimiter: ""
+            },
+            duration: 3,
+            ease: "none"
+        });
+
+        // 4. Pause slightly (using an empty tween)
+        tlLaptop.to({}, { duration: 0.5 });
+
+        // 5. Pop up the Pre-Mortem Warning Label!
+        tlLaptop.to("#warning-label", {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1.5,
+            ease: "elastic.out(1.2, 0.6)"
+        });
+        
+        // 6. Hold it there for a bit before unpinning
+        tlLaptop.to({}, { duration: 2 });
+
+    </script>
+</body>
+</html>

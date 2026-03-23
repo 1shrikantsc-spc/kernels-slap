@@ -18,5 +18,15 @@
     "user_id": "user_chickoo",
     "display_name": "Shrikant",
     "password_hash": "8f89e939acd909012b50238c28fa6738a566ee3ca2420522f8e4751b34073fd5"
+  },
+  "prakash": {
+    "user_id": "user_prakash",
+    "display_name": "pk",
+    "password_hash": "39be3689c9452e54bcca4f3e620d0d75566ae358ef0ff01fcd684f3c4efc9788"
+  },
+  "kunal": {
+    "user_id": "user_kunal",
+    "display_name": "kunal",
+    "password_hash": "f5cb9433ec112d7ae21755021b6da655953a6ca5e79d04e143ff54709fddbd8b"
   }
 }

@@ -546,6 +546,7 @@ async def execute_code(payload: dict):
     if language.lower() != "python":
         return {"output": "", "error": f"Language {language} not supported", "status": "error", "error_category": None}
 
+    temp_path = None
     with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w", encoding="utf-8") as temp_file:
         temp_file.write(code)
         temp_path = temp_file.name
@@ -578,6 +579,6 @@ async def execute_code(payload: dict):
         os.remove(temp_path)
         return {"output": "", "error": "Execution timed out (10s limit)", "status": "error", "error_category": "Logic"}
     except Exception as e:
-        if os.path.exists(temp_path):
+        if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
         return {"output": "", "error": str(e), "status": "error", "error_category": "Other"}

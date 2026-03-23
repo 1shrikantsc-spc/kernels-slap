@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Editor from "@monaco-editor/react";
-import { Brain, Zap, Target, BarChart2, CheckCircle, AlertTriangle, Lightbulb, Play, Code, Flame } from "lucide-react";
+import { Brain, Zap, Target, BarChart2, CheckCircle, AlertTriangle, Lightbulb, Play, Code } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
 
 const CATEGORY_COLORS: Record<string, string> = {

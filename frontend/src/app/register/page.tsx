@@ -1,17 +1,21 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { user, login, isLoading } = useAuth();
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && user) router.push("/dashboard");
+  }, [user, isLoading, router]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +40,14 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <main className="ks-bg min-h-screen flex items-center justify-center">
+        <span className="spinner" />
+      </main>
+    );
+  }
 
   return (
     <main className="ks-bg min-h-screen flex items-center justify-center p-4">
@@ -119,6 +131,15 @@ export default function RegisterPage() {
             Already have an account?{" "}
             <Link href="/login" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors">
               Sign in
+            </Link>
+          </p>
+        </div>
+
+        <div className="mt-3 text-center">
+          <p className="text-gray-500 text-sm">
+            Want to see the product first?{" "}
+            <Link href="/landing" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors">
+              View landing page
             </Link>
           </p>
         </div>

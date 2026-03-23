@@ -1,16 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { user, login, isLoading } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && user) router.push("/dashboard");
+  }, [user, isLoading, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,12 +33,20 @@ export default function LoginPage() {
         return;
       }
       login(data);
-      router.push("/");
+      router.push("/dashboard");
     } catch {
       setError("Could not reach server. Is the backend running?");
       setLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <main className="ks-bg min-h-screen flex items-center justify-center">
+        <span className="spinner" />
+      </main>
+    );
+  }
 
   return (
     <main className="ks-bg min-h-screen flex items-center justify-center p-4">
@@ -106,6 +118,10 @@ export default function LoginPage() {
             New here?{" "}
             <Link href="/register" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors">
               Create an account
+            </Link>
+            {"  "}·{"  "}
+            <Link href="/landing" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors">
+              View landing page
             </Link>
           </p>
         </div>
