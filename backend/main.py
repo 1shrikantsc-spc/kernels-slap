@@ -20,7 +20,7 @@ app.add_middleware(
         "http://localhost:3000", 
         "http://localhost:3002", 
         "http://localhost:3001",
-        "https://kernels-slap-frontend.vercel.app"  # <-- Add this line!
+        "https://kernels-slap-frontend.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
