@@ -16,11 +16,17 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3002", "http://localhost:3001","https://kernels-slap-frontend.vercel.app"],
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://localhost:3002", 
+        "http://localhost:3001",
+        "https://kernels-slap-frontend.vercel.app"  # <-- Add this line!
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 HINDSIGHT_API_KEY = os.getenv("HINDSIGHT_API_KEY")
